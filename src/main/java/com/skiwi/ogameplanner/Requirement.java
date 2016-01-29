@@ -12,7 +12,11 @@ public class Requirement {
         this.level = level;
     }
 
-    public boolean isAllowed(int checkLevel) {
-        return (checkLevel >= level);
+    public boolean isSatisfied(PlayerSnapshot playerSnapshot) {
+        if (gameObject instanceof Building) {
+            int snapshotLevel = playerSnapshot.getBuildingLevel((Building)gameObject);
+            return (snapshotLevel >= level);
+        }
+        throw new UnsupportedOperationException();
     }
 }

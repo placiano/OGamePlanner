@@ -7,5 +7,5 @@ public enum Resource {
     METAL,
     CRYSTAL,
     DEUTERIUM,
-    DARK_MATTER
+    DARK_MATTER;
 }
