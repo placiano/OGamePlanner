@@ -1,0 +1,2 @@
+# OGamePlanner
+Planner for OGame
