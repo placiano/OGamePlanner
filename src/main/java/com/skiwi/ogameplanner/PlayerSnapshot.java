@@ -123,7 +123,7 @@ public class PlayerSnapshot {
         PlayerSnapshot playerSnapshot = new PlayerSnapshot(serverSettings);
         playerSnapshot.performedActions.addAll(performedActions);
         playerSnapshot.performedActions.add(performedAction);
-        playerSnapshot.time = time;
+        playerSnapshot.time = time; //TODO maybe related ActionCost to Action and add it at this point?
         playerSnapshot.resources.putAll(resources);
         playerSnapshot.buildings.putAll(buildings);
         playerSnapshot.researches.putAll(researches);
@@ -132,16 +132,16 @@ public class PlayerSnapshot {
     }
 
     public boolean satisfiesResourcesCost(ActionCost actionCost) {
-        if (getResourceAmount(METAL) < actionCost.getMetal()) {
+        if ((int)Math.floor(getResourceAmount(METAL)) < actionCost.getMetal()) {
             return false;
         }
-        if (getResourceAmount(CRYSTAL) < actionCost.getCrystal()) {
+        if ((int)Math.floor(getResourceAmount(CRYSTAL)) < actionCost.getCrystal()) {
             return false;
         }
-        if (getResourceAmount(DEUTERIUM) < actionCost.getDeuterium()) {
+        if ((int)Math.floor(getResourceAmount(DEUTERIUM)) < actionCost.getDeuterium()) {
             return false;
         }
-        if (getResourceAmount(DARK_MATTER) < actionCost.getDarkMatter()) {
+        if ((int)Math.floor(getResourceAmount(DARK_MATTER)) < actionCost.getDarkMatter()) {
             return false;
         }
         return true;

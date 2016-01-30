@@ -23,7 +23,6 @@ public class Planner {
         queue.add(initialPlayerSnapshot);
         while (!queue.isEmpty()) {
             PlayerSnapshot playerSnapshot = queue.poll();
-
             if (earliestMatchingPlayerSnapshot != null && playerSnapshot.getTime() >= earliestMatchingPlayerSnapshot.getTime()) {
                 continue;
             }

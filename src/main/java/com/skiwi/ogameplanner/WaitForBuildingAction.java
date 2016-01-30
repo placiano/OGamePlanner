@@ -38,7 +38,7 @@ public class WaitForBuildingAction implements Action {
     @Override
     public PlayerSnapshot performAction(PlayerSnapshot playerSnapshot) {
         PlayerSnapshot newPlayerSnapshot = playerSnapshot.copyForNewAction(this);
-        playerSnapshot.wait(building.calculateWaitCost(playerSnapshot));
+        newPlayerSnapshot.wait(building.calculateWaitCost(playerSnapshot));
         return newPlayerSnapshot;
     }
 

@@ -179,11 +179,23 @@ public enum Building implements GameObject {
 
     public ActionCost calculateWaitCost(PlayerSnapshot playerSnapshot) {
         ActionCost upgradeCost = getUpgradeCost(playerSnapshot);
-        double metalWaitHours = (playerSnapshot.getResourceAmount(METAL) + upgradeCost.getMetal()) / METAL_MINE.getHourlyResourceProduction(playerSnapshot);
-        double crystalWaitHours = (playerSnapshot.getResourceAmount(CRYSTAL) + upgradeCost.getCrystal()) / CRYSTAL_MINE.getHourlyResourceProduction(playerSnapshot);
-        double deuteriumWaitHours = (playerSnapshot.getResourceAmount(DEUTERIUM) + upgradeCost.getDeuterium()) / DEUTERIUM_SYNTHESIZER.getHourlyResourceProduction(playerSnapshot);
-        double minimumWaitHours = Math.max(metalWaitHours, Math.max(crystalWaitHours, deuteriumWaitHours));
-        long minimumWaitSeconds = (long)Math.ceil(minimumWaitHours / 3600d);
+
+        double metalWaitHours = (upgradeCost.getMetal() - playerSnapshot.getResourceAmount(METAL)) / METAL_MINE.getHourlyResourceProduction(playerSnapshot);
+        double crystalWaitHours = (upgradeCost.getCrystal() - playerSnapshot.getResourceAmount(CRYSTAL)) / CRYSTAL_MINE.getHourlyResourceProduction(playerSnapshot);
+        double deuteriumWaitHours = (upgradeCost.getDeuterium() - playerSnapshot.getResourceAmount(DEUTERIUM)) / DEUTERIUM_SYNTHESIZER.getHourlyResourceProduction(playerSnapshot);
+
+        double minimumWaitHours = 0d;
+        if (upgradeCost.getMetal() > 0) {
+            minimumWaitHours = Math.max(minimumWaitHours, metalWaitHours);
+        }
+        if (upgradeCost.getCrystal() > 0) {
+            minimumWaitHours = Math.max(minimumWaitHours, crystalWaitHours);
+        }
+        if (upgradeCost.getDeuterium() > 0) {
+            minimumWaitHours = Math.max(minimumWaitHours, deuteriumWaitHours);
+        }
+
+        long minimumWaitSeconds = (long)Math.ceil(minimumWaitHours * 3600d);
         return new ActionCost(minimumWaitSeconds, 0, 0, 0, 0);
     }
 

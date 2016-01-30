@@ -1,6 +1,5 @@
 package com.skiwi.ogameplanner;
 
-import javax.annotation.Resources;
 import java.util.EnumMap;
 import java.util.function.Predicate;
 
@@ -23,7 +22,7 @@ public class OGamePlannerMain {
         initialPlayerSnapshot.initializeResources(initialResources);
 
         //TODO currently it checks for metal mine level, later check for Small Cargo 1
-        Predicate<PlayerSnapshot> successPredicate = playerSnapshot -> (playerSnapshot.getBuildingLevel(METAL_MINE) == 2);
+        Predicate<PlayerSnapshot> successPredicate = playerSnapshot -> (playerSnapshot.getBuildingLevel(METAL_MINE) == 3);
 
         Planner planner = new Planner(initialPlayerSnapshot, successPredicate);
         PlayerSnapshot earliestPlayerSnapshot = planner.plan();
