@@ -19,6 +19,10 @@ public class Planner {
     public PlayerSnapshot plan() {
         PlayerSnapshot earliestMatchingPlayerSnapshot = null;
 
+        if (successPredicate.test(initialPlayerSnapshot)) {
+            return initialPlayerSnapshot;
+        }
+
         PriorityQueue<PlayerSnapshot> queue = new PriorityQueue<>(Comparator.comparingLong(PlayerSnapshot::getTime));
         queue.add(initialPlayerSnapshot);
         while (!queue.isEmpty()) {
