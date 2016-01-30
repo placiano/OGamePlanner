@@ -29,5 +29,8 @@ public class StartUpgradeBuildingAction implements Action {
         return newPlayerSnapshot;
     }
 
-    //TODO toString that shows action description and cost
+    @Override
+    public String toString() {
+        return "StartUpgradeBuildingAction(" + building + ")";
+    }
 }

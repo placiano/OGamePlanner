@@ -1,5 +1,9 @@
 package com.skiwi.ogameplanner;
 
+import static com.skiwi.ogameplanner.Resource.CRYSTAL;
+import static com.skiwi.ogameplanner.Resource.DEUTERIUM;
+import static com.skiwi.ogameplanner.Resource.METAL;
+
 /**
  * @author Frank van Heeswijk
  */
@@ -10,7 +14,7 @@ public enum Building implements GameObject {
             int currentLevel = playerSnapshot.getBuildingLevel(this);
             int metalCost = (int)Math.floor(60 * Math.pow(1.5d, currentLevel));
             int crystalCost = (int)Math.floor(15 * Math.pow(1.5d, currentLevel));
-            int time = calculateTime(metalCost, crystalCost, playerSnapshot);
+            long time = calculateTime(metalCost, crystalCost, playerSnapshot);
             return new ActionCost(time, metalCost, crystalCost, 0, 0);
         }
 
@@ -33,7 +37,7 @@ public enum Building implements GameObject {
             int currentLevel = playerSnapshot.getBuildingLevel(this);
             int metalCost = (int)Math.floor(48 * Math.pow(1.6d, currentLevel));
             int crystalCost = (int)Math.floor(24 * Math.pow(1.6d, currentLevel));
-            int time = calculateTime(metalCost, crystalCost, playerSnapshot);
+            long time = calculateTime(metalCost, crystalCost, playerSnapshot);
             return new ActionCost(time, metalCost, crystalCost, 0, 0);
         }
 
@@ -56,7 +60,7 @@ public enum Building implements GameObject {
             int currentLevel = playerSnapshot.getBuildingLevel(this);
             int metalCost = (int)Math.floor(225 * Math.pow(1.5d, currentLevel));
             int crystalCost = (int)Math.floor(75 * Math.pow(1.5d, currentLevel));
-            int time = calculateTime(metalCost, crystalCost, playerSnapshot);
+            long time = calculateTime(metalCost, crystalCost, playerSnapshot);
             return new ActionCost(time, metalCost, crystalCost, 0, 0);
         }
 
@@ -77,7 +81,7 @@ public enum Building implements GameObject {
             int currentLevel = playerSnapshot.getBuildingLevel(this);
             int metalCost = (int)Math.floor(75 * Math.pow(1.5d, currentLevel));
             int crystalCost = (int)Math.floor(30 * Math.pow(1.5d, currentLevel));
-            int time = calculateTime(metalCost, crystalCost, playerSnapshot);
+            long time = calculateTime(metalCost, crystalCost, playerSnapshot);
             return new ActionCost(time, metalCost, crystalCost, 0, 0);
         }
 
@@ -99,7 +103,7 @@ public enum Building implements GameObject {
             int metalCost = (int)Math.floor(400 * Math.pow(2d, currentLevel));
             int crystalCost = (int)Math.floor(120 * Math.pow(2d, currentLevel));
             int deuteriumCost = (int)Math.floor(200 * Math.pow(2d, currentLevel));
-            int time = calculateTime(metalCost, crystalCost, playerSnapshot);
+            long time = calculateTime(metalCost, crystalCost, playerSnapshot);
             return new ActionCost(time, metalCost, crystalCost, deuteriumCost, 0);
         }
 
@@ -120,7 +124,7 @@ public enum Building implements GameObject {
             int metalCost = (int)Math.floor(400 * Math.pow(2d, currentLevel));
             int crystalCost = (int)Math.floor(200 * Math.pow(2d, currentLevel));
             int deuteriumCost = (int)Math.floor(100 * Math.pow(2d, currentLevel));
-            int time = calculateTime(metalCost, crystalCost, playerSnapshot);
+            long time = calculateTime(metalCost, crystalCost, playerSnapshot);
             return new ActionCost(time, metalCost, crystalCost, deuteriumCost, 0);
         }
 
@@ -141,7 +145,7 @@ public enum Building implements GameObject {
             int metalCost = (int)Math.floor(200 * Math.pow(2d, currentLevel));
             int crystalCost = (int)Math.floor(400 * Math.pow(2d, currentLevel));
             int deuteriumCost = (int)Math.floor(200 * Math.pow(2d, currentLevel));
-            int time = calculateTime(metalCost, crystalCost, playerSnapshot);
+            long time = calculateTime(metalCost, crystalCost, playerSnapshot);
             return new ActionCost(time, metalCost, crystalCost, deuteriumCost, 0);
         }
 
@@ -175,11 +179,11 @@ public enum Building implements GameObject {
 
     public ActionCost calculateWaitCost(PlayerSnapshot playerSnapshot) {
         ActionCost upgradeCost = getUpgradeCost(playerSnapshot);
-        double metalWaitHours = upgradeCost.getMetal() / METAL_MINE.getHourlyResourceProduction(playerSnapshot);
-        double crystalWaitHours = upgradeCost.getCrystal() / CRYSTAL_MINE.getHourlyResourceProduction(playerSnapshot);
-        double deuteriumWaitHours = upgradeCost.getDeuterium() / DEUTERIUM_SYNTHESIZER.getHourlyResourceProduction(playerSnapshot);
-        double minimumWaitHours = Math.min(metalWaitHours, Math.min(crystalWaitHours, deuteriumWaitHours));
-        int minimumWaitSeconds = (int)Math.ceil(minimumWaitHours / 60d);
+        double metalWaitHours = (playerSnapshot.getResourceAmount(METAL) + upgradeCost.getMetal()) / METAL_MINE.getHourlyResourceProduction(playerSnapshot);
+        double crystalWaitHours = (playerSnapshot.getResourceAmount(CRYSTAL) + upgradeCost.getCrystal()) / CRYSTAL_MINE.getHourlyResourceProduction(playerSnapshot);
+        double deuteriumWaitHours = (playerSnapshot.getResourceAmount(DEUTERIUM) + upgradeCost.getDeuterium()) / DEUTERIUM_SYNTHESIZER.getHourlyResourceProduction(playerSnapshot);
+        double minimumWaitHours = Math.max(metalWaitHours, Math.max(crystalWaitHours, deuteriumWaitHours));
+        long minimumWaitSeconds = (long)Math.ceil(minimumWaitHours / 3600d);
         return new ActionCost(minimumWaitSeconds, 0, 0, 0, 0);
     }
 
@@ -188,14 +192,20 @@ public enum Building implements GameObject {
         int crystalEnergyCost = CRYSTAL_MINE.getEnergyCost(playerSnapshot);
         int deuteriumEnergyCost = DEUTERIUM_SYNTHESIZER.getEnergyCost(playerSnapshot);
         int solarPlantEnergyCost = SOLAR_PLANT.getEnergyCost(playerSnapshot);
-        return (metalEnergyCost + crystalEnergyCost + deuteriumEnergyCost) / (-solarPlantEnergyCost * 1d);
+        if (solarPlantEnergyCost == 0) {
+            return 1d;
+        }
+        else {
+            double energyModifier = (metalEnergyCost + crystalEnergyCost + deuteriumEnergyCost) / (-solarPlantEnergyCost * 1d);
+            return Math.min(0d, Math.max(energyModifier, 1d));
+        }
     }
 
-    public static int calculateTime(int metalCost, int crystalCost, PlayerSnapshot playerSnapshot) {
+    public static long calculateTime(int metalCost, int crystalCost, PlayerSnapshot playerSnapshot) {
         int roboticsFactoryLevel = playerSnapshot.getBuildingLevel(ROBOTICS_FACTORY);
         int economySpeed = playerSnapshot.getServerSettings().getEconomySpeed();
         int naniteFactoryLevel = 0; //TODO add this
         double timeInHours = (metalCost + crystalCost) / (2500d * (1 + roboticsFactoryLevel) * economySpeed * Math.pow(2d, naniteFactoryLevel));
-        return (int)Math.floor(timeInHours / 60d);
+        return (long)Math.ceil(timeInHours * 3600d);
     }
 }

@@ -4,14 +4,14 @@ package com.skiwi.ogameplanner;
  * @author Frank van Heeswijk
  */
 public class ActionCost {
-    private final int time;
+    private final long time;
 
     private final int metal;
     private final int crystal;
     private final int deuterium;
     private final int darkMatter;
 
-    public ActionCost(int time, int metal, int crystal, int deuterium, int darkMatter) {
+    public ActionCost(long time, int metal, int crystal, int deuterium, int darkMatter) {
         this.time = time;
         this.metal = metal;
         this.crystal = crystal;
@@ -19,7 +19,7 @@ public class ActionCost {
         this.darkMatter = darkMatter;
     }
 
-    public int getTime() {
+    public long getTime() {
         return time;
     }
 

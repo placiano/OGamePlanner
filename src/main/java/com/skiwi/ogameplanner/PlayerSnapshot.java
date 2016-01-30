@@ -3,6 +3,7 @@ package com.skiwi.ogameplanner;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.skiwi.ogameplanner.Building.*;
 import static com.skiwi.ogameplanner.Resource.*;
@@ -13,9 +14,9 @@ import static com.skiwi.ogameplanner.Resource.*;
 public class PlayerSnapshot {
     private final ServerSettings serverSettings;
 
-    private final List<Action> actions = new ArrayList<>();
+    private final List<Action> performedActions = new ArrayList<>();
 
-    private int time = 0;
+    private long time = 0;
 
     private final EnumMap<Resource, Double> resources = new EnumMap<>(Resource.class);
     private final EnumMap<Building, Integer> buildings = new EnumMap<>(Building.class);
@@ -26,13 +27,33 @@ public class PlayerSnapshot {
 
     public PlayerSnapshot(ServerSettings serverSettings) {
         this.serverSettings = serverSettings;
+
+        for (Resource resource : Resource.values()) {
+            resources.put(resource, 0d);
+        }
+
+        for (Building building : Building.values()) {
+            buildings.put(building, 0);
+        }
+
+        for (Research research : Research.values()) {
+            researches.put(research, 0);
+        }
+
+        for (Ship ship : Ship.values()) {
+            ships.put(ship, 0);
+        }
     }
 
     public ServerSettings getServerSettings() {
         return serverSettings;
     }
 
-    public int getTime() {
+    public List<Action> getPerformedActions() {
+        return performedActions;
+    }
+
+    public long getTime() {
         return time;
     }
 
@@ -52,9 +73,26 @@ public class PlayerSnapshot {
         return ships.getOrDefault(ship, 0);
     }
 
+    public void initializeResources(Map<Resource, Double> resources) {
+        this.resources.putAll(resources);
+    }
+
+    public void initializeBuildings(Map<Building, Integer> buildings) {
+        this.buildings.putAll(buildings);
+    }
+
+    public void initializeResearches(Map<Research, Integer> researches) {
+        this.researches.putAll(researches);
+    }
+
+    public void initializeShips(Map<Ship, Integer> ships) {
+        this.ships.putAll(ships);
+    }
+
     public List<Action> generateActions() {
         List<Action> actions = new ArrayList<>();
         addBuildingActions(actions);
+        //TODO add actions for other things too
         return actions;
     }
 
@@ -81,9 +119,10 @@ public class PlayerSnapshot {
         }
     }
 
-    public PlayerSnapshot copyForNewAction(Action action) {
+    public PlayerSnapshot copyForNewAction(Action performedAction) {
         PlayerSnapshot playerSnapshot = new PlayerSnapshot(serverSettings);
-        playerSnapshot.actions.add(action);
+        playerSnapshot.performedActions.addAll(performedActions);
+        playerSnapshot.performedActions.add(performedAction);
         playerSnapshot.time = time;
         playerSnapshot.resources.putAll(resources);
         playerSnapshot.buildings.putAll(buildings);
@@ -116,9 +155,9 @@ public class PlayerSnapshot {
     private void addTimeCost(ActionCost actionCost) {
         time += actionCost.getTime();
 
-        double metalProduction = METAL_MINE.getHourlyResourceProduction(this) / 60d;
-        double crystalProduction = CRYSTAL_MINE.getHourlyResourceProduction(this) / 60d;
-        double deuteriumProduction = DEUTERIUM_SYNTHESIZER.getHourlyResourceProduction(this) / 60d;
+        double metalProduction = METAL_MINE.getHourlyResourceProduction(this) / 3600d;
+        double crystalProduction = CRYSTAL_MINE.getHourlyResourceProduction(this) / 3600d;
+        double deuteriumProduction = DEUTERIUM_SYNTHESIZER.getHourlyResourceProduction(this) / 3600d;
 
         //TODO create better system to add resources
         resources.merge(METAL, metalProduction * actionCost.getTime(), (amount, production) -> amount + production);
@@ -145,6 +184,7 @@ public class PlayerSnapshot {
     public void finishUpgradeBuilding(Building building) {
         addTimeCost(building.getUpgradeCost(this));
         buildings.merge(building, 1, (currentLevel, newLevels) -> currentLevel + newLevels);
+        buildingInProgress = null;
     }
 
     public boolean isCurrentlyUpgradingBuilding(Building building) {
