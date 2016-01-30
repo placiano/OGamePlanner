@@ -5,4 +5,13 @@ package com.skiwi.ogameplanner;
  */
 public interface GameObject {
     Requirement[] getRequirements();
+
+    default boolean satisfiesRequirements(PlayerSnapshot playerSnapshot) {
+        for (Requirement requirement : getRequirements()) {
+            if (!requirement.isSatisfied(playerSnapshot)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

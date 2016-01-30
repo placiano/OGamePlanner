@@ -3,10 +3,10 @@ package com.skiwi.ogameplanner;
 /**
  * @author Frank van Heeswijk
  */
-public class UpgradeBuildingAction implements Action {
+public class StartUpgradeBuildingAction implements Action {
     private final Building building;
 
-    public UpgradeBuildingAction(Building building) {
+    public StartUpgradeBuildingAction(Building building) {
         this.building = building;
     }
 
@@ -17,14 +17,17 @@ public class UpgradeBuildingAction implements Action {
                 return false;
             }
         }
+        //TODO save cost here?
         ActionCost actionCost = building.getUpgradeCost(playerSnapshot);
-        return playerSnapshot.satisfiesCost(actionCost);
+        return playerSnapshot.satisfiesResourcesCost(actionCost);
     }
 
     @Override
     public PlayerSnapshot performAction(PlayerSnapshot playerSnapshot) {
-        PlayerSnapshot newPlayerSnapshot = playerSnapshot.copy();
-        newPlayerSnapshot.upgradeBuilding(building);
+        PlayerSnapshot newPlayerSnapshot = playerSnapshot.copyForNewAction(this);
+        newPlayerSnapshot.startUpgradeBuilding(building);
         return newPlayerSnapshot;
     }
+
+    //TODO toString that shows action description and cost
 }
