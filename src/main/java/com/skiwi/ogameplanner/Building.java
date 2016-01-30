@@ -28,7 +28,7 @@ public enum Building implements GameObject {
         public double getHourlyResourceProduction(PlayerSnapshot playerSnapshot) {
             int metalMineLevel = playerSnapshot.getBuildingLevel(METAL_MINE);
             int economySpeed = playerSnapshot.getServerSettings().getEconomySpeed();
-            return (30d + 30d * metalMineLevel * Math.pow(1.1d, metalMineLevel)) * economySpeed * calculateEnergyModifier(playerSnapshot);
+            return (30d + (30d * metalMineLevel * Math.pow(1.1d, metalMineLevel) * calculateEnergyModifier(playerSnapshot))) * economySpeed;
         }
     },
     CRYSTAL_MINE {
@@ -51,7 +51,7 @@ public enum Building implements GameObject {
         public double getHourlyResourceProduction(PlayerSnapshot playerSnapshot) {
             int crystalMineLevel = playerSnapshot.getBuildingLevel(CRYSTAL_MINE);
             int economySpeed = playerSnapshot.getServerSettings().getEconomySpeed();
-            return (15d + 20d * crystalMineLevel * Math.pow(1.1d, crystalMineLevel)) * economySpeed * calculateEnergyModifier(playerSnapshot);
+            return (15d + (20d * crystalMineLevel * Math.pow(1.1d, crystalMineLevel) * calculateEnergyModifier(playerSnapshot))) * economySpeed;
         }
     },
     DEUTERIUM_SYNTHESIZER {
@@ -205,11 +205,11 @@ public enum Building implements GameObject {
         int deuteriumEnergyCost = DEUTERIUM_SYNTHESIZER.getEnergyCost(playerSnapshot);
         int solarPlantEnergyCost = SOLAR_PLANT.getEnergyCost(playerSnapshot);
         if (solarPlantEnergyCost == 0) {
-            return 1d;
+            return 0d;
         }
         else {
             double energyModifier = (metalEnergyCost + crystalEnergyCost + deuteriumEnergyCost) / (-solarPlantEnergyCost * 1d);
-            return Math.min(0d, Math.max(energyModifier, 1d));
+            return Math.min(Math.max(energyModifier, 0d), 1d);
         }
     }
 
