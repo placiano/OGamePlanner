@@ -23,6 +23,11 @@ public class FinishUpgradeBuildingAction implements Action {
     }
 
     @Override
+    public long getTimeCost(PlayerSnapshot playerSnapshot) {
+        return building.getUpgradeCost(playerSnapshot).getTime();
+    }
+
+    @Override
     public String toString() {
         return "FinishUpgradeBuildingAction(" + building + ")";
     }

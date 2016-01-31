@@ -30,6 +30,11 @@ public class StartUpgradeBuildingAction implements Action {
     }
 
     @Override
+    public long getTimeCost(PlayerSnapshot playerSnapshot) {
+        return 0;
+    }
+
+    @Override
     public String toString() {
         return "StartUpgradeBuildingAction(" + building + ")";
     }

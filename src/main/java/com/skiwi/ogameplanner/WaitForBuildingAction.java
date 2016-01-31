@@ -43,6 +43,37 @@ public class WaitForBuildingAction implements Action {
     }
 
     @Override
+    public long getTimeCost(PlayerSnapshot playerSnapshot) {
+        double metalHourlyProduction = METAL_MINE.getHourlyResourceProduction(playerSnapshot);
+        double crystalHourlyProduction = CRYSTAL_MINE.getHourlyResourceProduction(playerSnapshot);
+        double deuteriumHourlyProduction = DEUTERIUM_SYNTHESIZER.getHourlyResourceProduction(playerSnapshot);
+
+        ActionCost upgradeCost = building.getUpgradeCost(playerSnapshot);
+
+        double metalWaitHours = (playerSnapshot.getResourceAmount(METAL) + upgradeCost.getMetal()) / metalHourlyProduction;
+        double crystalWaitHours = (playerSnapshot.getResourceAmount(CRYSTAL) + upgradeCost.getCrystal()) / crystalHourlyProduction;
+        double deuteriumWaitHours = (playerSnapshot.getResourceAmount(DEUTERIUM) + upgradeCost.getDeuterium()) / deuteriumHourlyProduction;
+
+        if (Double.isInfinite(metalWaitHours) || Double.isInfinite(crystalWaitHours) || Double.isInfinite(deuteriumWaitHours)) {
+            throw new IllegalStateException("this cannot happen if getTimeCost() is called after isAllowed()");
+        }
+        else {
+            double minimumWaitHours = 0d;
+            if (upgradeCost.getMetal() > 0) {
+                minimumWaitHours = Math.max(minimumWaitHours, metalWaitHours);
+            }
+            if (upgradeCost.getCrystal() > 0) {
+                minimumWaitHours = Math.max(minimumWaitHours, crystalWaitHours);
+            }
+            if (upgradeCost.getDeuterium() > 0) {
+                minimumWaitHours = Math.max(minimumWaitHours, deuteriumWaitHours);
+            }
+
+            return (long)Math.ceil(minimumWaitHours * 3600d);
+        }
+    }
+
+    @Override
     public String toString() {
         return "WaitForBuildingAction(" + building + ")";
     }

@@ -7,4 +7,6 @@ public interface Action {
     boolean isAllowed(PlayerSnapshot playerSnapshot);
 
     PlayerSnapshot performAction(PlayerSnapshot playerSnapshot);
+
+    long getTimeCost(PlayerSnapshot playerSnapshot);
 }
