@@ -1,6 +1,7 @@
 package com.skiwi.ogameplanner;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.function.Predicate;
 
 /**
@@ -16,48 +17,14 @@ public class Planner {
     }
 
     public PlayerSnapshot plan() {
-//        PlayerSnapshot earliestMatchingPlayerSnapshot = null;
-
         if (successPredicate.test(initialPlayerSnapshot)) {
             return initialPlayerSnapshot;
         }
-
-//        PriorityQueue<PlayerSnapshot> queue = new PriorityQueue<>(Comparator.comparingLong(PlayerSnapshot::getTime));
-//        queue.add(initialPlayerSnapshot);
-//        while (!queue.isEmpty()) {
-//            PlayerSnapshot playerSnapshot = queue.poll();
-//            if (earliestMatchingPlayerSnapshot != null && playerSnapshot.getTime() >= earliestMatchingPlayerSnapshot.getTime()) {
-//                continue;
-//            }
-//
-//            for (Action action : playerSnapshot.generateActions()) {
-//                if (action.isAllowed(playerSnapshot)) {
-//                    PlayerSnapshot resultingPlayerSnapshot = action.performAction(playerSnapshot);
-//                    if (successPredicate.test(resultingPlayerSnapshot)) {
-//                        if (earliestMatchingPlayerSnapshot == null) {
-//                            earliestMatchingPlayerSnapshot = resultingPlayerSnapshot;
-//                        } else {
-//                            if (resultingPlayerSnapshot.getTime() < earliestMatchingPlayerSnapshot.getTime()) {
-//                                earliestMatchingPlayerSnapshot = resultingPlayerSnapshot;
-//                            }
-//                        }
-//                    } else {
-//                        queue.add(resultingPlayerSnapshot);
-//                    }
-//                }
-//            }
-//
-//        return earliestMatchingPlayerSnapshot;
 
         long limit = 50;
         while (true) {
             limit *= 2;
             System.out.println("limit = " + limit);
-//            PlayerSnapshot earliestMatchingPlayerSnapshot = dfsPlan(initialPlayerSnapshot, limit);
-//            if (earliestMatchingPlayerSnapshot != null) {
-//                return earliestMatchingPlayerSnapshot;
-//            }
-
             PlayerSnapshot earliestMatchingSnapshot = null;
 
             Deque<PlayerSnapshot> stack = new ArrayDeque<>();
@@ -99,30 +66,4 @@ public class Planner {
             }
         }
     }
-
-//    private PlayerSnapshot dfsPlan(PlayerSnapshot playerSnapshot, long limit) {
-//        if (successPredicate.test(playerSnapshot)) {
-//            return playerSnapshot;
-//        }
-//        if (playerSnapshot.getTime() > limit) {
-//            return null;
-//        }
-//
-//        PlayerSnapshot earliestMatchingPlayerSnapshot = null;
-//        for (Action action : playerSnapshot.generateActions()) {
-//            PlayerSnapshot resultingPlayerSnapshot = dfsPlan(action.performAction(playerSnapshot), limit);
-//            if (resultingPlayerSnapshot != null && successPredicate.test(resultingPlayerSnapshot)) {
-//                if (earliestMatchingPlayerSnapshot == null) {
-//                    earliestMatchingPlayerSnapshot = resultingPlayerSnapshot;
-//                }
-//                else {
-//                    if (resultingPlayerSnapshot.getTime() < earliestMatchingPlayerSnapshot.getTime()) {
-//                        earliestMatchingPlayerSnapshot = resultingPlayerSnapshot;
-//                    }
-//                }
-//            }
-//        }
-//
-//        return earliestMatchingPlayerSnapshot;
-//    }
 }
