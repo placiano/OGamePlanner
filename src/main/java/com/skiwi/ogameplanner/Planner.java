@@ -1,7 +1,7 @@
 package com.skiwi.ogameplanner;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 import java.util.function.Predicate;
 
 /**
@@ -25,58 +25,88 @@ public class Planner {
             return initialPlayerSnapshot;
         }
 
-        long limit = heuristic.calculate(initialPlayerSnapshot, goal);
+        //ignoring the closed list as the same state should not occur more than once
 
-        while (true) {
-            System.out.println("Limit: " + limit);
+        PriorityQueue<PlayerSnapshot> openQueue = new PriorityQueue<>(Comparator.comparingLong(playerSnapshot -> playerSnapshot.calculateEstimatedTotalTimeUsingHeuristic(heuristic, goal)));
+        openQueue.add(initialPlayerSnapshot);
+        while (!openQueue.isEmpty()) {
+            PlayerSnapshot playerSnapshot = openQueue.poll();
 
-            PlayerSnapshot earliestMatchingSnapshot = null;
-            PlayerSnapshot earliestLeafSnapshot = null;
+            if (goalPredicate.test(playerSnapshot)) {
+                return playerSnapshot;
+            }
 
-            Deque<PlayerSnapshot> stack = new ArrayDeque<>();
-            stack.push(initialPlayerSnapshot);
-            while (!stack.isEmpty()) {
-                PlayerSnapshot playerSnapshot = stack.pop();
+            for (Action action : playerSnapshot.generateActions()) {
+                if (action.isAllowed(playerSnapshot)) {
+                    PlayerSnapshot successor = action.performAction(playerSnapshot);
 
-                long estimatedCost = playerSnapshot.getTime() + heuristic.calculate(playerSnapshot, goal);
-                if (estimatedCost > limit) {
-                    if (earliestLeafSnapshot == null || playerSnapshot.getTime() < earliestLeafSnapshot.getTime()) {
-                        earliestLeafSnapshot = playerSnapshot;
-                    }
-                    continue;
-                }
-
-                //custom addition to IDA* as cost between to snapshots is never < 0
-                if (earliestMatchingSnapshot != null && playerSnapshot.getTime() >= earliestMatchingSnapshot.getTime()) {
-                    continue;
-                }
-
-                if (goalPredicate.test(playerSnapshot)) {
-                    System.out.println("MATCH @ t = " + playerSnapshot.getTime());
-                    if (earliestMatchingSnapshot == null) {
-                        earliestMatchingSnapshot = playerSnapshot;
-                    }
-                    else {
-                        if (playerSnapshot.getTime() < earliestMatchingSnapshot.getTime()) {
-                            earliestMatchingSnapshot = playerSnapshot;
-                        }
-                    }
-                    continue;
-                }
-
-                for (Action action : playerSnapshot.generateActions()) {
-                    if (action.isAllowed(playerSnapshot)) {
-                        stack.push(action.performAction(playerSnapshot));
+                    if (!openQueue.contains(successor)) {
+                        openQueue.add(successor);
                     }
                 }
             }
-
-            if (earliestMatchingSnapshot != null) {
-                return earliestMatchingSnapshot;
-            }
-
-            //finish iteration
-            limit = earliestLeafSnapshot.getTime() + heuristic.calculate(earliestLeafSnapshot, goal);
         }
+
+        return null;
     }
+
+//    public PlayerSnapshot plan() {
+//        if (goalPredicate.test(initialPlayerSnapshot)) {
+//            return initialPlayerSnapshot;
+//        }
+//
+//        long limit = heuristic.calculate(initialPlayerSnapshot, goal);
+//
+//        while (true) {
+//            System.out.println("Limit: " + limit);
+//
+//            PlayerSnapshot earliestMatchingSnapshot = null;
+//            PlayerSnapshot earliestLeafSnapshot = null;
+//
+//            Deque<PlayerSnapshot> stack = new ArrayDeque<>();
+//            stack.push(initialPlayerSnapshot);
+//            while (!stack.isEmpty()) {
+//                PlayerSnapshot playerSnapshot = stack.pop();
+//
+//                long estimatedCost = playerSnapshot.getTime() + heuristic.calculate(playerSnapshot, goal);
+//                if (estimatedCost > limit) {
+//                    if (earliestLeafSnapshot == null || playerSnapshot.getTime() < earliestLeafSnapshot.getTime()) {
+//                        earliestLeafSnapshot = playerSnapshot;
+//                    }
+//                    continue;
+//                }
+//
+//                //custom addition to IDA* as cost between to snapshots is never < 0
+//                if (earliestMatchingSnapshot != null && playerSnapshot.getTime() >= earliestMatchingSnapshot.getTime()) {
+//                    continue;
+//                }
+//
+//                if (goalPredicate.test(playerSnapshot)) {
+//                    System.out.println("MATCH @ t = " + playerSnapshot.getTime());
+//                    if (earliestMatchingSnapshot == null) {
+//                        earliestMatchingSnapshot = playerSnapshot;
+//                    }
+//                    else {
+//                        if (playerSnapshot.getTime() < earliestMatchingSnapshot.getTime()) {
+//                            earliestMatchingSnapshot = playerSnapshot;
+//                        }
+//                    }
+//                    continue;
+//                }
+//
+//                for (Action action : playerSnapshot.generateActions()) {
+//                    if (action.isAllowed(playerSnapshot)) {
+//                        stack.push(action.performAction(playerSnapshot));
+//                    }
+//                }
+//            }
+//
+//            if (earliestMatchingSnapshot != null) {
+//                return earliestMatchingSnapshot;
+//            }
+//
+//            //finish iteration
+//            limit = earliestLeafSnapshot.getTime() + heuristic.calculate(earliestLeafSnapshot, goal);
+//        }
+//    }
 }

@@ -190,4 +190,8 @@ public class PlayerSnapshot {
     public boolean isCurrentlyUpgradingBuilding(Building building) {
         return (buildingInProgress == building);
     }
+
+    public long calculateEstimatedTotalTimeUsingHeuristic(Heuristic heuristic, PlayerSnapshot goal) {
+        return time + heuristic.calculate(this, goal);
+    }
 }
