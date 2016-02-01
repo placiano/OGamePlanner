@@ -38,4 +38,8 @@ public class ActionCost {
     public int getDarkMatter() {
         return darkMatter;
     }
+
+    public ActionCost plus(ActionCost other) {
+        return new ActionCost(this.time + other.time, this.metal + other.metal, this.crystal + other.crystal, this.deuterium + other.deuterium, this.darkMatter + other.darkMatter);
+    }
 }
