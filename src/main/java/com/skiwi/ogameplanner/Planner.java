@@ -29,9 +29,6 @@ public class Planner {
 
         while (true) {
             System.out.println("Limit: " + limit);
-//            if (2 % 2 == 0) {
-//                return null;
-//            }
 
             PlayerSnapshot earliestMatchingSnapshot = null;
             PlayerSnapshot earliestLeafSnapshot = null;
@@ -82,59 +79,4 @@ public class Planner {
             limit = earliestLeafSnapshot.getTime() + heuristic.calculate(earliestLeafSnapshot, goal);
         }
     }
-
-//    public PlayerSnapshot plan() {
-//        if (successPredicate.test(initialPlayerSnapshot)) {
-//            return initialPlayerSnapshot;
-//        }
-//
-//        long limit = 50;
-//        while (true) {
-//            limit *= 2;
-//            System.out.println("limit = " + limit);
-//            PlayerSnapshot earliestMatchingSnapshot = null;
-//
-//            Deque<PlayerSnapshot> stack = new ArrayDeque<>();
-//            stack.add(initialPlayerSnapshot);
-//            while (!stack.isEmpty()) {
-//                PlayerSnapshot playerSnapshot = stack.pop();
-//
-//                if (earliestMatchingSnapshot != null && playerSnapshot.getTime() >= earliestMatchingSnapshot.getTime()) {
-//                    continue;
-//                }
-//
-//                if (successPredicate.test(playerSnapshot)) {
-//                    System.out.println("MATCH @ t = " + playerSnapshot.getTime());
-//                    if (earliestMatchingSnapshot == null) {
-//                        earliestMatchingSnapshot = playerSnapshot;
-//                    }
-//                    else {
-//                        if (playerSnapshot.getTime() < earliestMatchingSnapshot.getTime()) {
-//                            earliestMatchingSnapshot = playerSnapshot;
-//                        }
-//                    }
-//                    continue;
-//                }
-//
-//                if (playerSnapshot.getTime() > limit) {
-//                    continue;
-//                }
-//
-//                List<Action> sortedActions = new ArrayList<>();
-//                for (Action action : playerSnapshot.generateActions()) {
-//                    if (action.isAllowed(playerSnapshot)) {
-//                        sortedActions.add(action);
-//                    }
-//                }
-//                Collections.sort(sortedActions, Comparator.comparingLong(action -> action.getTimeCost(playerSnapshot)));
-//                for (Action action : sortedActions) {
-//                    stack.push(action.performAction(playerSnapshot));
-//                }
-//            }
-//
-//            if (earliestMatchingSnapshot != null) {
-//                return earliestMatchingSnapshot;
-//            }
-//        }
-//    }
 }

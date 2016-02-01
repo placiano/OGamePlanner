@@ -26,11 +26,6 @@ public class BasicHeuristic implements Heuristic {
             totalActionCost = totalActionCost.plus(building.calculateTotalUpgradeCost(goal, playerSnapshot.getBuildingLevel(building), goal.getBuildingLevel(building)));
         }
 
-//        System.out.println("Total time cost: " + totalActionCost.getTime());
-//        System.out.println("Total metal cost: " + totalActionCost.getMetal());
-//        System.out.println("Total crystal cost: " + totalActionCost.getCrystal());
-//        System.out.println("Total deuterium cost: " + totalActionCost.getDeuterium());
-
         int currentMetal = (int)Math.floor(playerSnapshot.getResourceAmount(METAL));
         int currentCrystal = (int)Math.floor(playerSnapshot.getResourceAmount(CRYSTAL));
         int currentDeuterium = (int)Math.floor(playerSnapshot.getResourceAmount(DEUTERIUM));
@@ -51,18 +46,9 @@ public class BasicHeuristic implements Heuristic {
         totalActionCost = new ActionCost(totalActionCost.getTime(), totalMetal, totalCrystal, totalDeuterium, totalActionCost.getDeuterium());
         //TODO what about DM?
 
-//        System.out.println("Total-RES time cost: " + totalActionCost.getTime());
-//        System.out.println("Total-RES metal cost: " + totalActionCost.getMetal());
-//        System.out.println("Total-RES crystal cost: " + totalActionCost.getCrystal());
-//        System.out.println("Total-RES deuterium cost: " + totalActionCost.getDeuterium());
-
         double metalHourlyProduction = METAL_MINE.getOptimalHourlyResourceProduction(goal);
         double crystalHourlyProduction = CRYSTAL_MINE.getOptimalHourlyResourceProduction(goal);
         double deuteriumHourlyProduction = DEUTERIUM_SYNTHESIZER.getOptimalHourlyResourceProduction(goal);
-
-//        System.out.println("Hourly metal production in goal: " + metalHourlyProduction);
-//        System.out.println("Hourly crystal production in goal: " + crystalHourlyProduction);
-//        System.out.println("Hourly deuterium production in goal: " + deuteriumHourlyProduction);
 
         double metalWaitHours = (totalActionCost.getMetal()) / metalHourlyProduction;
         double crystalWaitHours = (totalActionCost.getCrystal()) / crystalHourlyProduction;

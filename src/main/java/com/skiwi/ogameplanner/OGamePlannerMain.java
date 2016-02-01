@@ -42,32 +42,6 @@ public class OGamePlannerMain {
         }
         System.out.println("---");
         earliestPlayerSnapshot.getPerformedActions().forEach(System.out::println);
-
-//        System.out.println();
-//        System.out.println();
-//        System.out.println();
-//
-//        PlayerSnapshot ps1 = initialPlayerSnapshot;
-//        System.out.println("ps1.generateActions() = " + ps1.generateActions());
-//        System.out.println("ps1.getResourceAmount(METAL) = " + ps1.getResourceAmount(METAL));
-//        System.out.println("ps1.getResourceAmount(CRYSTAL) = " + ps1.getResourceAmount(CRYSTAL));
-//        System.out.println("ps1.getResourceAmount(DEUTERIUM) = " + ps1.getResourceAmount(DEUTERIUM));
-//
-//        System.out.println();
-//
-//        PlayerSnapshot ps2 = ps1.generateActions().get(0).performAction(ps1);
-//        System.out.println("ps2.generateActions() = " + ps2.generateActions());
-//        System.out.println("ps2.getResourceAmount(METAL) = " + ps2.getResourceAmount(METAL));
-//        System.out.println("ps2.getResourceAmount(CRYSTAL) = " + ps2.getResourceAmount(CRYSTAL));
-//        System.out.println("ps2.getResourceAmount(DEUTERIUM) = " + ps2.getResourceAmount(DEUTERIUM));
-//
-//        System.out.println();
-//
-//        PlayerSnapshot ps3 = ps2.generateActions().get(0).performAction(ps2);
-//        System.out.println("ps2.generateActions() = " + ps3.generateActions());
-//        System.out.println("ps2.getResourceAmount(METAL) = " + ps3.getResourceAmount(METAL));
-//        System.out.println("ps2.getResourceAmount(CRYSTAL) = " + ps3.getResourceAmount(CRYSTAL));
-//        System.out.println("ps2.getResourceAmount(DEUTERIUM) = " + ps3.getResourceAmount(DEUTERIUM));
     }
 
     public static void main(String[] args) {
