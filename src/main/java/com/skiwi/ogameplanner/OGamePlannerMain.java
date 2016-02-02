@@ -31,7 +31,7 @@ public class OGamePlannerMain {
 
         Heuristic heuristic = new BasicHeuristic();
 
-        Planner planner = new Planner(initialPlayerSnapshot, goal, goalPredicate, heuristic);
+        Planner planner = new Planner(initialPlayerSnapshot, goal, goalPredicate, heuristic, 2);
         PlayerSnapshot earliestPlayerSnapshot = planner.plan();
 
         System.out.println("Time elapsed: " + earliestPlayerSnapshot.getTime() + " seconds");
