@@ -34,18 +34,23 @@ public class Planner {
             return initialPlayerSnapshot;
         }
 
-//        System.out.println("---TEST---");
-//        List<Building> testBuilderOrder = Arrays.asList(SOLAR_PLANT, SOLAR_PLANT, METAL_MINE, METAL_MINE, METAL_MINE, CRYSTAL_MINE, METAL_MINE, SOLAR_PLANT, CRYSTAL_MINE, METAL_MINE, CRYSTAL_MINE, SOLAR_PLANT, METAL_MINE, SOLAR_PLANT, METAL_MINE, SOLAR_PLANT, CRYSTAL_MINE, METAL_MINE, METAL_MINE, METAL_MINE);
-//        long testTime = calculateTimeForBuildOrder(testBuilderOrder);
-//        System.out.println("testTime = " + testTime);
-//        List<Building> testBuildOrder2 = Arrays.asList(SOLAR_PLANT, SOLAR_PLANT, METAL_MINE, METAL_MINE, METAL_MINE, CRYSTAL_MINE, SOLAR_PLANT, METAL_MINE, CRYSTAL_MINE, SOLAR_PLANT, METAL_MINE, CRYSTAL_MINE, SOLAR_PLANT, METAL_MINE, METAL_MINE, SOLAR_PLANT, CRYSTAL_MINE, METAL_MINE, METAL_MINE, METAL_MINE);
-//        long testTime2 = calculateTimeForBuildOrder(testBuildOrder2);
-//        System.out.println("testTime2 = " + testTime2);
-//        System.out.println("---/TEST---");
+        PlayerSnapshot earliestPlayerSnapshot = null;
 
+        for (int localLookahead = 1; localLookahead <= lookahead; localLookahead++) {
+            PlayerSnapshot playerSnapshot = lookahead(localLookahead);
+            if (earliestPlayerSnapshot == null || playerSnapshot.getTime() < earliestPlayerSnapshot.getTime()) {
+                earliestPlayerSnapshot = playerSnapshot;
+            }
+            System.out.println();
+        }
+
+        return earliestPlayerSnapshot;
+    }
+
+    private PlayerSnapshot lookahead(int localLookahead) {
         List<Building> buildOrder = initializeBuildOrder();
         long leastTime = calculateTimeForBuildOrder(buildOrder);
-        System.out.println("Lookahead: " + lookahead);
+        System.out.println("Lookahead: " + localLookahead);
         System.out.println("Time: " + leastTime + " / Build Order: " + buildOrder);
 
         while (true) {
@@ -56,7 +61,7 @@ public class Planner {
             List<List<Building>> allBuildings = new ArrayList<>();
             List<List<Integer>> allPositions = new ArrayList<>();
             //loop over greedy-1 until greedy-n
-            for (int currentLookahead = 1; currentLookahead <= lookahead; currentLookahead++) {
+            for (int currentLookahead = 1; currentLookahead <= localLookahead; currentLookahead++) {
                 buildOrdersForLookahead(possibleBuildings, buildOrder.size(), allBuildings, allPositions, new ArrayList<>(), new ArrayList<>(), currentLookahead, 0);
             }
 
