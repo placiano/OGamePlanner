@@ -83,13 +83,20 @@ public enum Building implements GameObject {
 
         @Override
         public double getHourlyResourceProduction(PlayerSnapshot playerSnapshot) {
-            return 0d;  //TODO implement this later, depends on planet temperature too
+            int deuteriumSynthesizerLevel = playerSnapshot.getBuildingLevel(DEUTERIUM_SYNTHESIZER);
+            int economySpeed = playerSnapshot.getServerSettings().getEconomySpeed();
+            int averagePlanetTemperature = playerSnapshot.getAveragePlanetTemperature();
+            double planetTemperatureModifier = (-0.004d * averagePlanetTemperature) + 1.36d;
+            return (10d * deuteriumSynthesizerLevel * Math.pow(1.1d, deuteriumSynthesizerLevel) * planetTemperatureModifier * calculateEnergyModifier(playerSnapshot)) * economySpeed;
         }
 
         @Override
         public double getOptimalHourlyResourceProduction(PlayerSnapshot playerSnapshot) {
-            //TODO do not take calculateEnergyModifier() into account
-            return 0d;  //TODO implement this later, depends on planet temperature too
+            int deuteriumSynthesizerLevel = playerSnapshot.getBuildingLevel(DEUTERIUM_SYNTHESIZER);
+            int economySpeed = playerSnapshot.getServerSettings().getEconomySpeed();
+            int averagePlanetTemperature = playerSnapshot.getAveragePlanetTemperature();
+            double planetTemperatureModifier = (-0.004d * averagePlanetTemperature) + 1.36d;
+            return (10d * deuteriumSynthesizerLevel * Math.pow(1.1d, deuteriumSynthesizerLevel) * planetTemperatureModifier) * economySpeed;
         }
     },
     SOLAR_PLANT {

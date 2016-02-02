@@ -5,9 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static com.skiwi.ogameplanner.Building.CRYSTAL_MINE;
-import static com.skiwi.ogameplanner.Building.METAL_MINE;
-import static com.skiwi.ogameplanner.Building.SOLAR_PLANT;
+import static com.skiwi.ogameplanner.Building.*;
 
 /**
  * @author Frank van Heeswijk
@@ -75,8 +73,9 @@ public class Planner {
                     buildOrder.add(position, building);
                 }
 
+                //if -1 is returned, it means it takes infinite time
                 long time = calculateTimeForBuildOrder(buildOrder);
-                if (time < leastTime) {
+                if (time > -1 && time < leastTime) {
                     leastTime = time;
                     bestBuildings = buildings;
                     bestPositions = positions;
@@ -128,7 +127,8 @@ public class Planner {
     }
 
     private long calculateTimeForBuildOrder(List<Building> buildOrder) {
-        return reconstructPlayerSnapshot(buildOrder).getTime();
+        PlayerSnapshot playerSnapshot = reconstructPlayerSnapshot(buildOrder);
+        return (playerSnapshot == null) ? -1 : playerSnapshot.getTime();
     }
 
     private static Action getActionPlayerSnapshotStartBuilding(PlayerSnapshot playerSnapshot, Building building) {
@@ -172,7 +172,7 @@ public class Planner {
 
     private List<Building> calculatePossibleBuildings(PlayerSnapshot playerSnapshot) {
         //TODO this should be done differently
-        return Arrays.asList(METAL_MINE, CRYSTAL_MINE, SOLAR_PLANT);
+        return Arrays.asList(METAL_MINE, CRYSTAL_MINE, DEUTERIUM_SYNTHESIZER, SOLAR_PLANT, ROBOTICS_FACTORY);
     }
 
     private PlayerSnapshot reconstructPlayerSnapshot(List<Building> buildOrder) {
@@ -197,7 +197,7 @@ public class Planner {
                         playerSnapshot = waitForBuildingAction.performAction(playerSnapshot);
                     }
                     else {
-                        throw new IllegalStateException("This should not happen");
+                        return null;
                     }
                 }
             }

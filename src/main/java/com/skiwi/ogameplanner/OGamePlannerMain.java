@@ -13,25 +13,25 @@ import static com.skiwi.ogameplanner.Resource.METAL;
 public class OGamePlannerMain {
     public void run() {
         ServerSettings serverSettings = new ServerSettings(1, 1);
-        PlayerSnapshot initialPlayerSnapshot = new PlayerSnapshot(serverSettings);
+        PlayerSnapshot initialPlayerSnapshot = new PlayerSnapshot(serverSettings, 10);
 
         EnumMap<Resource, Double> initialResources = new EnumMap<>(Resource.class);
         initialResources.put(METAL, 500d);
         initialResources.put(CRYSTAL, 500d);
         initialPlayerSnapshot.initializeResources(initialResources);
 
-        PlayerSnapshot goal = new PlayerSnapshot(serverSettings);
+        PlayerSnapshot goal = new PlayerSnapshot(serverSettings, 10);
 
         EnumMap<Building, Integer> goalBuildings = new EnumMap<>(Building.class);
-        goalBuildings.put(METAL_MINE, 10);
+        goalBuildings.put(METAL_MINE, 20);
         goal.initializeBuildings(goalBuildings);
 
         //TODO currently it checks for metal mine level, later check for Small Cargo 1
-        Predicate<PlayerSnapshot> goalPredicate = playerSnapshot -> (playerSnapshot.getBuildingLevel(METAL_MINE) == 10);
+        Predicate<PlayerSnapshot> goalPredicate = playerSnapshot -> (playerSnapshot.getBuildingLevel(METAL_MINE) == 20);
 
         Heuristic heuristic = new BasicHeuristic();
 
-        Planner planner = new Planner(initialPlayerSnapshot, goal, goalPredicate, heuristic, 3);
+        Planner planner = new Planner(initialPlayerSnapshot, goal, goalPredicate, heuristic, 2);
         PlayerSnapshot earliestPlayerSnapshot = planner.plan();
 
         System.out.println("Time elapsed: " + earliestPlayerSnapshot.getTime() + " seconds");

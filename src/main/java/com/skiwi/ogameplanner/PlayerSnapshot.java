@@ -13,6 +13,7 @@ import static com.skiwi.ogameplanner.Resource.*;
  */
 public class PlayerSnapshot {
     private final ServerSettings serverSettings;
+    private final int averagePlanetTemperature;
 
     private final List<Action> performedActions = new ArrayList<>();
 
@@ -25,8 +26,9 @@ public class PlayerSnapshot {
 
     private Building buildingInProgress = null;
 
-    public PlayerSnapshot(ServerSettings serverSettings) {
+    public PlayerSnapshot(ServerSettings serverSettings, int averagePlanetTemperature) {
         this.serverSettings = serverSettings;
+        this.averagePlanetTemperature = averagePlanetTemperature;
 
         for (Resource resource : Resource.values()) {
             resources.put(resource, 0d);
@@ -47,6 +49,10 @@ public class PlayerSnapshot {
 
     public ServerSettings getServerSettings() {
         return serverSettings;
+    }
+
+    public int getAveragePlanetTemperature() {
+        return averagePlanetTemperature;
     }
 
     public List<Action> getPerformedActions() {
@@ -120,7 +126,7 @@ public class PlayerSnapshot {
     }
 
     public PlayerSnapshot copyForNewAction(Action performedAction) {
-        PlayerSnapshot playerSnapshot = new PlayerSnapshot(serverSettings);
+        PlayerSnapshot playerSnapshot = new PlayerSnapshot(serverSettings, averagePlanetTemperature);
         playerSnapshot.performedActions.addAll(performedActions);
         playerSnapshot.performedActions.add(performedAction);
         playerSnapshot.time = time; //TODO maybe related ActionCost to Action and add it at this point?
