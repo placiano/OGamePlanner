@@ -255,7 +255,7 @@ public enum Building implements GameObject {
             return 0d;
         }
         else {
-            double energyModifier = (metalEnergyCost + crystalEnergyCost + deuteriumEnergyCost) / (-solarPlantEnergyCost * 1d);
+            double energyModifier = (-solarPlantEnergyCost * 1d) / (metalEnergyCost + crystalEnergyCost + deuteriumEnergyCost);
             return Math.min(Math.max(energyModifier, 0d), 1d);
         }
     }

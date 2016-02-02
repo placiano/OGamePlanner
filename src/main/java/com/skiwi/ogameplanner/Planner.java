@@ -45,7 +45,7 @@ public class Planner {
                 for (int position = 0; position < buildOrder.size(); position++) {
                     buildOrder.add(position, building);
                     long time = calculateTimeForBuildOrder(buildOrder);
-                    System.out.println("Time with " + building + " on between position " + position + " and " + (position + 1) + ": " + time);
+//                    System.out.println("Time with " + building + " on between position " + position + " and " + (position + 1) + ": " + time);
                     if (time < leastTime) {
                         leastTime = time;
                         bestBuilding = building;
