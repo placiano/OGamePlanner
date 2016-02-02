@@ -6,6 +6,8 @@ package com.skiwi.ogameplanner;
 public class StartUpgradeBuildingAction implements Action {
     private final Building building;
 
+    private long performedTimeCost = -1;
+
     public StartUpgradeBuildingAction(Building building) {
         this.building = building;
     }
@@ -24,6 +26,9 @@ public class StartUpgradeBuildingAction implements Action {
 
     @Override
     public PlayerSnapshot performAction(PlayerSnapshot playerSnapshot) {
+        //temp
+        performedTimeCost = getTimeCost(playerSnapshot);
+
         PlayerSnapshot newPlayerSnapshot = playerSnapshot.copyForNewAction(this);
         newPlayerSnapshot.startUpgradeBuilding(building);
         return newPlayerSnapshot;
@@ -40,6 +45,6 @@ public class StartUpgradeBuildingAction implements Action {
 
     @Override
     public String toString() {
-        return "StartUpgradeBuildingAction(" + building + ")";
+        return "StartUpgradeBuildingAction(" + building + ", " + performedTimeCost + ")";
     }
 }

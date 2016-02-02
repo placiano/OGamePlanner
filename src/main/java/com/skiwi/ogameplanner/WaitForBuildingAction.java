@@ -13,6 +13,8 @@ import static com.skiwi.ogameplanner.Resource.METAL;
 public class WaitForBuildingAction implements Action {
     private final Building building;
 
+    private long performedTimeCost = -1;
+
     public WaitForBuildingAction(Building building) {
         this.building = building;
     }
@@ -37,6 +39,9 @@ public class WaitForBuildingAction implements Action {
 
     @Override
     public PlayerSnapshot performAction(PlayerSnapshot playerSnapshot) {
+        //temp
+        performedTimeCost = getTimeCost(playerSnapshot);
+
         PlayerSnapshot newPlayerSnapshot = playerSnapshot.copyForNewAction(this);
         newPlayerSnapshot.wait(building.calculateWaitCost(playerSnapshot));
         return newPlayerSnapshot;
@@ -79,6 +84,6 @@ public class WaitForBuildingAction implements Action {
 
     @Override
     public String toString() {
-        return "WaitForBuildingAction(" + building + ")";
+        return "WaitForBuildingAction(" + building + ", " + performedTimeCost + ")";
     }
 }
