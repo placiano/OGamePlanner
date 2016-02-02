@@ -73,6 +73,10 @@ public class WaitForBuildingAction implements Action {
         }
     }
 
+    public Building getBuilding() {
+        return building;
+    }
+
     @Override
     public String toString() {
         return "WaitForBuildingAction(" + building + ")";

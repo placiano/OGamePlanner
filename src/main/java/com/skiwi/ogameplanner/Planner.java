@@ -1,8 +1,13 @@
 package com.skiwi.ogameplanner;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Predicate;
+
+import static com.skiwi.ogameplanner.Building.CRYSTAL_MINE;
+import static com.skiwi.ogameplanner.Building.METAL_MINE;
+import static com.skiwi.ogameplanner.Building.SOLAR_PLANT;
 
 /**
  * @author Frank van Heeswijk
@@ -20,63 +25,131 @@ public class Planner {
         this.heuristic = heuristic;
     }
 
+    //TODO later support other things than buildings too
+
     public PlayerSnapshot plan() {
         if (goalPredicate.test(initialPlayerSnapshot)) {
             return initialPlayerSnapshot;
         }
 
-        long limit = heuristic.calculate(initialPlayerSnapshot, goal);
+        List<Building> buildOrder = initializeBuildOrder();
+        long leastTime = calculateTimeForBuildOrder(buildOrder);
+        System.out.println("Time: " + leastTime + " / Build Order: " + buildOrder);
 
         while (true) {
-            System.out.println("Limit: " + limit);
+            List<Building> possibleBuildings = calculatePossibleBuildings(initialPlayerSnapshot);
+            Building bestBuilding = null;
+            int bestPosition = -1;
 
-            PlayerSnapshot earliestMatchingSnapshot = null;
-            PlayerSnapshot earliestLeafSnapshot = null;
-
-            Deque<PlayerSnapshot> stack = new ArrayDeque<>();
-            stack.push(initialPlayerSnapshot);
-            while (!stack.isEmpty()) {
-                PlayerSnapshot playerSnapshot = stack.pop();
-
-                long estimatedCost = playerSnapshot.getTime() + heuristic.calculate(playerSnapshot, goal);
-                if (estimatedCost > limit) {
-                    if (earliestLeafSnapshot == null || playerSnapshot.getTime() < earliestLeafSnapshot.getTime()) {
-                        earliestLeafSnapshot = playerSnapshot;
+            for (Building building : possibleBuildings) {
+                for (int position = 0; position < buildOrder.size(); position++) {
+                    buildOrder.add(position, building);
+                    long time = calculateTimeForBuildOrder(buildOrder);
+                    System.out.println("Time with " + building + " on between position " + position + " and " + (position + 1) + ": " + time);
+                    if (time < leastTime) {
+                        leastTime = time;
+                        bestBuilding = building;
+                        bestPosition = position;
                     }
-                    continue;
+                    buildOrder.remove(position);
                 }
+            }
 
-                //custom addition to IDA* as cost between to snapshots is never < 0
-                if (earliestMatchingSnapshot != null && playerSnapshot.getTime() >= earliestMatchingSnapshot.getTime()) {
-                    continue;
+            if (bestBuilding == null) {
+                //no improvement
+                return reconstructPlayerSnapshot(buildOrder);
+            } else {
+                buildOrder.add(bestPosition, bestBuilding);
+                System.out.println("Time: " + leastTime + " / Build Order: " + buildOrder);
+            }
+        }
+    }
+
+    private List<Building> initializeBuildOrder() {
+        //TODO expand this
+        List<Building> buildOrder = new ArrayList<>();
+        for (int i = 0; i < goal.getBuildingLevel(METAL_MINE); i++) {
+            buildOrder.add(METAL_MINE);
+        }
+        return buildOrder;
+    }
+
+    private long calculateTimeForBuildOrder(List<Building> buildOrder) {
+        return reconstructPlayerSnapshot(buildOrder).getTime();
+    }
+
+    private static Action getActionPlayerSnapshotStartBuilding(PlayerSnapshot playerSnapshot, Building building) {
+        for (Action action : playerSnapshot.generateActions()) {
+            if (action.isAllowed(playerSnapshot)) {
+                if (action instanceof FinishUpgradeBuildingAction) {
+                    if (((FinishUpgradeBuildingAction)action).getBuilding() == building) {
+                        return action;
+                    }
                 }
+            }
+        }
+        return null;
+    }
 
-                if (goalPredicate.test(playerSnapshot)) {
-                    System.out.println("MATCH @ t = " + playerSnapshot.getTime());
-                    if (earliestMatchingSnapshot == null) {
-                        earliestMatchingSnapshot = playerSnapshot;
+    private static Action getActionPlayerSnapshotFinishBuilding(PlayerSnapshot playerSnapshot, Building building) {
+        for (Action action : playerSnapshot.generateActions()) {
+            if (action.isAllowed(playerSnapshot)) {
+                if (action instanceof StartUpgradeBuildingAction) {
+                    if (((StartUpgradeBuildingAction)action).getBuilding() == building) {
+                        return action;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private static Action getActionPlayerSnapshotWaitForBuilding(PlayerSnapshot playerSnapshot, Building building) {
+        for (Action action : playerSnapshot.generateActions()) {
+            if (action.isAllowed(playerSnapshot)) {
+                if (action instanceof WaitForBuildingAction) {
+                    if (((WaitForBuildingAction)action).getBuilding() == building) {
+                        return action;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private List<Building> calculatePossibleBuildings(PlayerSnapshot playerSnapshot) {
+        //TODO this should be done differently
+        return Arrays.asList(METAL_MINE, CRYSTAL_MINE, SOLAR_PLANT);
+    }
+
+    private PlayerSnapshot reconstructPlayerSnapshot(List<Building> buildOrder) {
+        PlayerSnapshot playerSnapshot = initialPlayerSnapshot;
+
+        int currentBuildingIndex = 0;
+        while (currentBuildingIndex < buildOrder.size()) {
+            Building currentBuilding = buildOrder.get(currentBuildingIndex);
+            Action startBuildingAction = getActionPlayerSnapshotStartBuilding(playerSnapshot, currentBuilding);
+            if (startBuildingAction != null) {
+                playerSnapshot = startBuildingAction.performAction(playerSnapshot);
+                currentBuildingIndex++;
+            }
+            else {
+                Action finishBuildingAction = getActionPlayerSnapshotFinishBuilding(playerSnapshot, currentBuilding);
+                if (finishBuildingAction != null) {
+                    playerSnapshot = finishBuildingAction.performAction(playerSnapshot);
+                }
+                else {
+                    Action waitForBuildingAction = getActionPlayerSnapshotWaitForBuilding(playerSnapshot, currentBuilding);
+                    if (waitForBuildingAction != null) {
+                        playerSnapshot = waitForBuildingAction.performAction(playerSnapshot);
                     }
                     else {
-                        if (playerSnapshot.getTime() < earliestMatchingSnapshot.getTime()) {
-                            earliestMatchingSnapshot = playerSnapshot;
-                        }
-                    }
-                    continue;
-                }
-
-                for (Action action : playerSnapshot.generateActions()) {
-                    if (action.isAllowed(playerSnapshot)) {
-                        stack.push(action.performAction(playerSnapshot));
+                        throw new IllegalStateException("This should not happen");
                     }
                 }
             }
-
-            if (earliestMatchingSnapshot != null) {
-                return earliestMatchingSnapshot;
-            }
-
-            //finish iteration
-            limit = earliestLeafSnapshot.getTime() + heuristic.calculate(earliestLeafSnapshot, goal);
         }
+
+        return playerSnapshot;
     }
 }

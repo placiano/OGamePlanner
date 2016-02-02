@@ -5,7 +5,6 @@ import java.util.function.Predicate;
 
 import static com.skiwi.ogameplanner.Building.METAL_MINE;
 import static com.skiwi.ogameplanner.Resource.CRYSTAL;
-import static com.skiwi.ogameplanner.Resource.DEUTERIUM;
 import static com.skiwi.ogameplanner.Resource.METAL;
 
 /**
@@ -24,11 +23,11 @@ public class OGamePlannerMain {
         PlayerSnapshot goal = new PlayerSnapshot(serverSettings);
 
         EnumMap<Building, Integer> goalBuildings = new EnumMap<>(Building.class);
-        goalBuildings.put(METAL_MINE, 6);
+        goalBuildings.put(METAL_MINE, 10);
         goal.initializeBuildings(goalBuildings);
 
         //TODO currently it checks for metal mine level, later check for Small Cargo 1
-        Predicate<PlayerSnapshot> goalPredicate = playerSnapshot -> (playerSnapshot.getBuildingLevel(METAL_MINE) == 6);
+        Predicate<PlayerSnapshot> goalPredicate = playerSnapshot -> (playerSnapshot.getBuildingLevel(METAL_MINE) == 10);
 
         Heuristic heuristic = new BasicHeuristic();
 

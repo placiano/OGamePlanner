@@ -29,6 +29,10 @@ public class StartUpgradeBuildingAction implements Action {
         return newPlayerSnapshot;
     }
 
+    public Building getBuilding() {
+        return building;
+    }
+
     @Override
     public long getTimeCost(PlayerSnapshot playerSnapshot) {
         return 0;

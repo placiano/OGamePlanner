@@ -22,6 +22,10 @@ public class FinishUpgradeBuildingAction implements Action {
         return newPlayerSnapshot;
     }
 
+    public Building getBuilding() {
+        return building;
+    }
+
     @Override
     public long getTimeCost(PlayerSnapshot playerSnapshot) {
         return building.getUpgradeCost(playerSnapshot).getTime();
