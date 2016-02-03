@@ -2,6 +2,7 @@ package com.skiwi.ogameplanner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -118,12 +119,43 @@ public class Planner {
     }
 
     private List<Building> initializeBuildOrder() {
-        //TODO expand this
+        //TODO rewrite this
+        PlayerSnapshot dummyPlayerSnapshot = new PlayerSnapshot(initialPlayerSnapshot.getServerSettings(), initialPlayerSnapshot.getAveragePlanetTemperature());
+
+        int metalStorageLevel = 0;
+        int crystalStorageLevel = 0;
+
         List<Building> buildOrder = new ArrayList<>();
         for (int i = 0; i < goal.getBuildingLevel(METAL_MINE); i++) {
+            while (true) {
+                ActionCost upgradeCost = METAL_MINE.getUpgradeCost(dummyPlayerSnapshot, i);
+                boolean noStorageUpgrades = true;
+                if (upgradeCost.getMetal() > METAL_STORAGE.getStorageCapacity(createDummyPlayerSnapshotForStorage(METAL_STORAGE, metalStorageLevel))) {
+                    buildOrder.add(METAL_STORAGE);
+                    metalStorageLevel++;
+                    noStorageUpgrades = false;
+                }
+                if (upgradeCost.getCrystal() > CRYSTAL_STORAGE.getStorageCapacity(createDummyPlayerSnapshotForStorage(CRYSTAL_STORAGE, crystalStorageLevel))) {
+                    buildOrder.add(CRYSTAL_STORAGE);
+                    crystalStorageLevel++;
+                    noStorageUpgrades = false;
+                }
+                if (noStorageUpgrades) {
+                    break;
+                }
+            }
+
             buildOrder.add(METAL_MINE);
         }
         return buildOrder;
+    }
+
+    private PlayerSnapshot createDummyPlayerSnapshotForStorage(Building storageBuilding, int level) {
+        PlayerSnapshot dummyPlayerSnapshot = new PlayerSnapshot(initialPlayerSnapshot.getServerSettings(), initialPlayerSnapshot.getAveragePlanetTemperature());
+        EnumMap<Building, Integer> initialBuildings = new EnumMap<>(Building.class);
+        initialBuildings.put(storageBuilding, level);
+        dummyPlayerSnapshot.initializeBuildings(initialBuildings);
+        return dummyPlayerSnapshot;
     }
 
     private long calculateTimeForBuildOrder(List<Building> buildOrder) {
@@ -172,7 +204,7 @@ public class Planner {
 
     private List<Building> calculatePossibleBuildings(PlayerSnapshot playerSnapshot) {
         //TODO this should be done differently
-        return Arrays.asList(METAL_MINE, CRYSTAL_MINE, DEUTERIUM_SYNTHESIZER, SOLAR_PLANT, ROBOTICS_FACTORY);
+        return Arrays.asList(METAL_MINE, CRYSTAL_MINE, DEUTERIUM_SYNTHESIZER, METAL_STORAGE, CRYSTAL_STORAGE, DEUTERIUM_TANK, SOLAR_PLANT, ROBOTICS_FACTORY);
     }
 
     private PlayerSnapshot reconstructPlayerSnapshot(List<Building> buildOrder) {
