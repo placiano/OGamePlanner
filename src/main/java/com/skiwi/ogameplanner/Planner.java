@@ -104,9 +104,8 @@ public class Planner {
                         continue;
                     }
 
-                    int aboveItself = 0;//(modifier > 0) ? 1 : 0;
                     Building buildingToMove = buildOrder.remove(position);
-                    buildOrder.add(position + modifier - aboveItself, buildingToMove);
+                    buildOrder.add(position + modifier, buildingToMove);
 
                     //if -1 is returned, it means it takes infinite time
                     long time = calculateTimeForBuildOrder(buildOrder);
@@ -117,7 +116,7 @@ public class Planner {
                         swapModifier = modifier;
                     }
 
-                    Building buildingToMoveBack = buildOrder.remove(position + modifier - aboveItself);
+                    Building buildingToMoveBack = buildOrder.remove(position + modifier);
                     buildOrder.add(position, buildingToMoveBack);
                 }
             }
@@ -134,8 +133,7 @@ public class Planner {
                     break;
                 case REPOSITION:
                     Building buildingToMove = buildOrder.remove(swapPosition);
-                    int aboveItself = 0;//(swapModifier > 0) ? 1 : 0;
-                    buildOrder.add(swapPosition + swapModifier - aboveItself, buildingToMove);
+                    buildOrder.add(swapPosition + swapModifier, buildingToMove);
                     System.out.println("Time: " + leastTime + " / Build Order: " + buildOrder);
                     break;
             }
