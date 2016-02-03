@@ -46,7 +46,7 @@ public class Planner {
         return earliestPlayerSnapshot;
     }
 
-    private enum ImprovementType { NONE, ADD, REPOSITION }
+    private enum ImprovementType { NONE, ADD, REPOSITION, REMOVE }
 
     private PlayerSnapshot lookahead(int localLookahead) {
         List<Building> buildOrder = initializeBuildOrder();
@@ -121,6 +121,29 @@ public class Planner {
                 }
             }
 
+            //check for removal
+            int removePosition = -1;
+
+            for (int position = 0; position < buildOrder.size(); position++) {
+                Building removedBuilding = buildOrder.remove(position);
+
+                //check if removal is allowed
+                //TODO rewrite this to keep track of protected buildings by their indices
+                //TODO support other buildings than metal mine
+                int metalMineLevel = (int)buildOrder.stream().filter(building -> building == METAL_MINE).count();
+                if (metalMineLevel >= goal.getBuildingLevel(METAL_MINE)) {
+                    //if -1 is returned, it means it takes infinite time
+                    long time = calculateTimeForBuildOrder(buildOrder);
+                    if (time > -1 && time < leastTime) {
+                        improvementType = ImprovementType.REMOVE;
+                        leastTime = time;
+                        removePosition = position;
+                    }
+                }
+
+                buildOrder.add(position, removedBuilding);
+            }
+
             switch (improvementType) {
                 case NONE:
                     //no improvement
@@ -129,14 +152,15 @@ public class Planner {
                     for (int i = 0; i < bestBuildings.size(); i++) {
                         buildOrder.add(bestPositions.get(i), bestBuildings.get(i));
                     }
-                    System.out.println("Time: " + leastTime + " / Build Order: " + buildOrder);
                     break;
                 case REPOSITION:
                     Building buildingToMove = buildOrder.remove(swapPosition);
                     buildOrder.add(swapPosition + swapModifier, buildingToMove);
-                    System.out.println("Time: " + leastTime + " / Build Order: " + buildOrder);
                     break;
+                case REMOVE:
+                    buildOrder.remove(removePosition);
             }
+            System.out.println("Time: " + leastTime + " / Build Order: " + buildOrder);
         }
     }
 
