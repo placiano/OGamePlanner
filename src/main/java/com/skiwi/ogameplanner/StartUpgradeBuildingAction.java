@@ -19,7 +19,6 @@ public class StartUpgradeBuildingAction implements Action {
                 return false;
             }
         }
-        //TODO save cost here?
         ActionCost actionCost = building.getUpgradeCost(playerSnapshot);
         return playerSnapshot.satisfiesResourcesCost(actionCost);
     }

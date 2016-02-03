@@ -1,8 +1,6 @@
 package com.skiwi.ogameplanner;
 
-import static com.skiwi.ogameplanner.Building.CRYSTAL_MINE;
-import static com.skiwi.ogameplanner.Building.DEUTERIUM_SYNTHESIZER;
-import static com.skiwi.ogameplanner.Building.METAL_MINE;
+import static com.skiwi.ogameplanner.Building.*;
 import static com.skiwi.ogameplanner.Resource.CRYSTAL;
 import static com.skiwi.ogameplanner.Resource.DEUTERIUM;
 import static com.skiwi.ogameplanner.Resource.METAL;
@@ -34,6 +32,17 @@ public class WaitForBuildingAction implements Action {
         if (Double.isInfinite(metalWaitHours) || Double.isInfinite(crystalWaitHours) || Double.isInfinite(deuteriumWaitHours)) {
             return false;
         }
+
+        if (upgradeCost.getMetal() > METAL_STORAGE.getStorageCapacity(playerSnapshot)) {
+            return false;
+        }
+        if (upgradeCost.getCrystal() > CRYSTAL_STORAGE.getStorageCapacity(playerSnapshot)) {
+            return false;
+        }
+        if (upgradeCost.getDeuterium() > DEUTERIUM_TANK.getStorageCapacity(playerSnapshot)) {
+            return false;
+        }
+
         return true;
     }
 

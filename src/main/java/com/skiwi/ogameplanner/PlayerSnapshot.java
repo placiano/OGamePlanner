@@ -150,6 +150,15 @@ public class PlayerSnapshot {
         if ((int)Math.floor(getResourceAmount(DARK_MATTER)) < actionCost.getDarkMatter()) {
             return false;
         }
+        if (actionCost.getMetal() > METAL_STORAGE.getStorageCapacity(this)) {
+            return false;
+        }
+        if (actionCost.getCrystal() > CRYSTAL_STORAGE.getStorageCapacity(this)) {
+            return false;
+        }
+        if (actionCost.getDeuterium() > DEUTERIUM_TANK.getStorageCapacity(this)) {
+            return false;
+        }
         return true;
     }
 
@@ -166,9 +175,9 @@ public class PlayerSnapshot {
         double deuteriumProduction = DEUTERIUM_SYNTHESIZER.getHourlyResourceProduction(this) / 3600d;
 
         //TODO create better system to add resources
-        resources.merge(METAL, metalProduction * actionCost.getTime(), (amount, production) -> amount + production);
-        resources.merge(CRYSTAL, crystalProduction * actionCost.getTime(), (amount, production) -> amount + production);
-        resources.merge(DEUTERIUM, deuteriumProduction * actionCost.getTime(), (amount, production) -> amount + production);
+        resources.merge(METAL, metalProduction * actionCost.getTime(), (amount, production) -> Math.min(amount + production, METAL_STORAGE.getStorageCapacity(this)));
+        resources.merge(CRYSTAL, crystalProduction * actionCost.getTime(), (amount, production) -> Math.min(amount + production, CRYSTAL_STORAGE.getStorageCapacity(this)));
+        resources.merge(DEUTERIUM, deuteriumProduction * actionCost.getTime(), (amount, production) -> Math.min(amount + production, DEUTERIUM_TANK.getStorageCapacity(this)));
     }
 
     private void addResourcesCost(ActionCost actionCost) {
