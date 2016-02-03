@@ -36,6 +36,11 @@ public enum Building implements GameObject {
             int economySpeed = playerSnapshot.getServerSettings().getEconomySpeed();
             return (30d + (30d * metalMineLevel * Math.pow(1.1d, metalMineLevel))) * economySpeed;
         }
+
+        @Override
+        public long getStorageCapacity(PlayerSnapshot playerSnapshot) {
+            return 0;
+        }
     },
     CRYSTAL_MINE {
         @Override
@@ -64,6 +69,11 @@ public enum Building implements GameObject {
             int crystalMineLevel = playerSnapshot.getBuildingLevel(CRYSTAL_MINE);
             int economySpeed = playerSnapshot.getServerSettings().getEconomySpeed();
             return (15d + (20d * crystalMineLevel * Math.pow(1.1d, crystalMineLevel))) * economySpeed;
+        }
+
+        @Override
+        public long getStorageCapacity(PlayerSnapshot playerSnapshot) {
+            return 0;
         }
     },
     DEUTERIUM_SYNTHESIZER {
@@ -98,6 +108,11 @@ public enum Building implements GameObject {
             double planetTemperatureModifier = (-0.004d * averagePlanetTemperature) + 1.36d;
             return (10d * deuteriumSynthesizerLevel * Math.pow(1.1d, deuteriumSynthesizerLevel) * planetTemperatureModifier) * economySpeed;
         }
+
+        @Override
+        public long getStorageCapacity(PlayerSnapshot playerSnapshot) {
+            return 0;
+        }
     },
     SOLAR_PLANT {
         @Override
@@ -122,6 +137,100 @@ public enum Building implements GameObject {
         @Override
         public double getOptimalHourlyResourceProduction(PlayerSnapshot playerSnapshot) {
             return 0d;
+        }
+
+        @Override
+        public long getStorageCapacity(PlayerSnapshot playerSnapshot) {
+            return 0;
+        }
+    },
+    METAL_STORAGE {
+        @Override
+        public ActionCost getUpgradeCost(PlayerSnapshot playerSnapshot, int startLevel) {
+            int metalCost = (int)Math.floor(1000 * Math.pow(2, startLevel));
+            long time = calculateTime(metalCost, 0, playerSnapshot);
+            return new ActionCost(time, metalCost, 0, 0, 0);
+        }
+
+        @Override
+        public int getEnergyCost(PlayerSnapshot playerSnapshot) {
+            return 0;
+        }
+
+        @Override
+        public double getHourlyResourceProduction(PlayerSnapshot playerSnapshot) {
+            return 0;
+        }
+
+        @Override
+        public double getOptimalHourlyResourceProduction(PlayerSnapshot playerSnapshot) {
+            return 0;
+        }
+
+        @Override
+        public long getStorageCapacity(PlayerSnapshot playerSnapshot) {
+            int currentLevel = playerSnapshot.getBuildingLevel(this);
+            return (long)(5000L * Math.floor(2.5d * Math.exp((currentLevel * 20d) / 33d)));
+        }
+    },
+    CRYSTAL_STORAGE {
+        @Override
+        public ActionCost getUpgradeCost(PlayerSnapshot playerSnapshot, int startLevel) {
+            int metalCost = (int)Math.floor(1000 * Math.pow(2, startLevel));
+            int crystalCost = (int)Math.floor(500 * Math.pow(2, startLevel));
+            long time = calculateTime(metalCost, crystalCost, playerSnapshot);
+            return new ActionCost(time, metalCost, crystalCost, 0, 0);
+        }
+
+        @Override
+        public int getEnergyCost(PlayerSnapshot playerSnapshot) {
+            return 0;
+        }
+
+        @Override
+        public double getHourlyResourceProduction(PlayerSnapshot playerSnapshot) {
+            return 0;
+        }
+
+        @Override
+        public double getOptimalHourlyResourceProduction(PlayerSnapshot playerSnapshot) {
+            return 0;
+        }
+
+        @Override
+        public long getStorageCapacity(PlayerSnapshot playerSnapshot) {
+            int currentLevel = playerSnapshot.getBuildingLevel(this);
+            return (long)(5000L * Math.floor(2.5d * Math.exp((currentLevel * 20d) / 33d)));
+        }
+    },
+    DEUTERIUM_TANK {
+        @Override
+        public ActionCost getUpgradeCost(PlayerSnapshot playerSnapshot, int startLevel) {
+            int metalCost = (int)Math.floor(1000 * Math.pow(2, startLevel));
+            int crystalCost = (int)Math.floor(1000 * Math.pow(2, startLevel));
+            long time = calculateTime(metalCost, crystalCost, playerSnapshot);
+            return new ActionCost(time, metalCost, crystalCost, 0, 0);
+        }
+
+        @Override
+        public int getEnergyCost(PlayerSnapshot playerSnapshot) {
+            return 0;
+        }
+
+        @Override
+        public double getHourlyResourceProduction(PlayerSnapshot playerSnapshot) {
+            return 0;
+        }
+
+        @Override
+        public double getOptimalHourlyResourceProduction(PlayerSnapshot playerSnapshot) {
+            return 0;
+        }
+
+        @Override
+        public long getStorageCapacity(PlayerSnapshot playerSnapshot) {
+            int currentLevel = playerSnapshot.getBuildingLevel(this);
+            return (long)(5000L * Math.floor(2.5d * Math.exp((currentLevel * 20d) / 33d)));
         }
     },
     ROBOTICS_FACTORY {
@@ -148,6 +257,11 @@ public enum Building implements GameObject {
         public double getOptimalHourlyResourceProduction(PlayerSnapshot playerSnapshot) {
             return 0d;
         }
+
+        @Override
+        public long getStorageCapacity(PlayerSnapshot playerSnapshot) {
+            return 0;
+        }
     },
     SHIPYARD(new Requirement(ROBOTICS_FACTORY, 2)) {
         @Override
@@ -172,6 +286,11 @@ public enum Building implements GameObject {
         @Override
         public double getOptimalHourlyResourceProduction(PlayerSnapshot playerSnapshot) {
             return 0d;
+        }
+
+        @Override
+        public long getStorageCapacity(PlayerSnapshot playerSnapshot) {
+            return 0;
         }
     },
     RESEARCH_LAB {
@@ -198,6 +317,11 @@ public enum Building implements GameObject {
         public double getOptimalHourlyResourceProduction(PlayerSnapshot playerSnapshot) {
             return 0d;
         }
+
+        @Override
+        public long getStorageCapacity(PlayerSnapshot playerSnapshot) {
+            return 0;
+        }
     };
 
     private Requirement[] requirements;
@@ -222,6 +346,8 @@ public enum Building implements GameObject {
     public abstract double getHourlyResourceProduction(PlayerSnapshot playerSnapshot);
 
     public abstract double getOptimalHourlyResourceProduction(PlayerSnapshot playerSnapshot);
+
+    public abstract long getStorageCapacity(PlayerSnapshot playerSnapshot);
 
     public ActionCost calculateWaitCost(PlayerSnapshot playerSnapshot) {
         ActionCost upgradeCost = getUpgradeCost(playerSnapshot);
