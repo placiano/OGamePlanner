@@ -46,6 +46,8 @@ public class Planner {
         return earliestPlayerSnapshot;
     }
 
+    private enum ImprovementType { NONE, ADD, REPOSITION }
+
     private PlayerSnapshot lookahead(int localLookahead) {
         List<Building> buildOrder = initializeBuildOrder();
         long leastTime = calculateTimeForBuildOrder(buildOrder);
@@ -53,6 +55,9 @@ public class Planner {
         System.out.println("Time: " + leastTime + " / Build Order: " + buildOrder);
 
         while (true) {
+            ImprovementType improvementType = ImprovementType.NONE;
+
+            //check for add improvement
             List<Building> possibleBuildings = calculatePossibleBuildings(initialPlayerSnapshot);
             List<Building> bestBuildings = new ArrayList<>();
             List<Integer> bestPositions = new ArrayList<>();
@@ -77,6 +82,7 @@ public class Planner {
                 //if -1 is returned, it means it takes infinite time
                 long time = calculateTimeForBuildOrder(buildOrder);
                 if (time > -1 && time < leastTime) {
+                    improvementType = ImprovementType.ADD;
                     leastTime = time;
                     bestBuildings = buildings;
                     bestPositions = positions;
@@ -88,14 +94,50 @@ public class Planner {
                 }
             }
 
-            if (bestBuildings.isEmpty()) {
-                //no improvement
-                return reconstructPlayerSnapshot(buildOrder);
-            } else {
-                for (int i = 0; i < bestBuildings.size(); i++) {
-                    buildOrder.add(bestPositions.get(i), bestBuildings.get(i));
+            //check for reposition improvement
+            int swapPosition = -1;
+            int swapModifier = Integer.MIN_VALUE;
+
+            for (int position = 0; position < buildOrder.size(); position++) {
+                for (int modifier = -position; modifier < buildOrder.size() - position; modifier++) {
+                    if (modifier == 0) {
+                        continue;
+                    }
+
+                    int aboveItself = 0;//(modifier > 0) ? 1 : 0;
+                    Building buildingToMove = buildOrder.remove(position);
+                    buildOrder.add(position + modifier - aboveItself, buildingToMove);
+
+                    //if -1 is returned, it means it takes infinite time
+                    long time = calculateTimeForBuildOrder(buildOrder);
+                    if (time > -1 && time < leastTime) {
+                        improvementType = ImprovementType.REPOSITION;
+                        leastTime = time;
+                        swapPosition = position;
+                        swapModifier = modifier;
+                    }
+
+                    Building buildingToMoveBack = buildOrder.remove(position + modifier - aboveItself);
+                    buildOrder.add(position, buildingToMoveBack);
                 }
-                System.out.println("Time: " + leastTime + " / Build Order: " + buildOrder);
+            }
+
+            switch (improvementType) {
+                case NONE:
+                    //no improvement
+                    return reconstructPlayerSnapshot(buildOrder);
+                case ADD:
+                    for (int i = 0; i < bestBuildings.size(); i++) {
+                        buildOrder.add(bestPositions.get(i), bestBuildings.get(i));
+                    }
+                    System.out.println("Time: " + leastTime + " / Build Order: " + buildOrder);
+                    break;
+                case REPOSITION:
+                    Building buildingToMove = buildOrder.remove(swapPosition);
+                    int aboveItself = 0;//(swapModifier > 0) ? 1 : 0;
+                    buildOrder.add(swapPosition + swapModifier - aboveItself, buildingToMove);
+                    System.out.println("Time: " + leastTime + " / Build Order: " + buildOrder);
+                    break;
             }
         }
     }
