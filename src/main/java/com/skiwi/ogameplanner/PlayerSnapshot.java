@@ -205,4 +205,43 @@ public class PlayerSnapshot {
     public boolean isCurrentlyUpgradingBuilding(Building building) {
         return (buildingInProgress == building);
     }
+
+    //temp method
+    public Building buildingThatBlocksStartingOrWaitingForBuilding(Building building) {
+        //TODO does not handle requirements yet (and never will)
+
+        double metalHourlyProduction = METAL_MINE.getHourlyResourceProduction(this);
+        double crystalHourlyProduction = CRYSTAL_MINE.getHourlyResourceProduction(this);
+        double deuteriumHourlyProduction = DEUTERIUM_SYNTHESIZER.getHourlyResourceProduction(this);
+
+        ActionCost upgradeCost = building.getUpgradeCost(this);
+
+        double metalWaitHours = (getResourceAmount(METAL) + upgradeCost.getMetal()) / metalHourlyProduction;
+        double crystalWaitHours = (getResourceAmount(CRYSTAL) + upgradeCost.getCrystal()) / crystalHourlyProduction;
+        double deuteriumWaitHours = (getResourceAmount(DEUTERIUM) + upgradeCost.getDeuterium()) / deuteriumHourlyProduction;
+
+        if (Double.isInfinite(metalWaitHours) || Double.isInfinite(crystalWaitHours)) {
+            throw new IllegalStateException("this should not happen");
+        }
+        if (Double.isInfinite(deuteriumWaitHours)) {
+            if (getBuildingLevel(DEUTERIUM_SYNTHESIZER) == 0) {
+                return DEUTERIUM_SYNTHESIZER;
+            }
+            else {
+                return SOLAR_PLANT;
+            }
+        }
+
+        if (upgradeCost.getMetal() > METAL_STORAGE.getStorageCapacity(this)) {
+            return METAL_STORAGE;
+        }
+        if (upgradeCost.getCrystal() > CRYSTAL_STORAGE.getStorageCapacity(this)) {
+            return CRYSTAL_STORAGE;
+        }
+        if (upgradeCost.getDeuterium() > DEUTERIUM_TANK.getStorageCapacity(this)) {
+            return DEUTERIUM_TANK;
+        }
+
+        throw new IllegalStateException("this should not be called if starting or waiting for the building was allowed in the first place");
+    }
 }
