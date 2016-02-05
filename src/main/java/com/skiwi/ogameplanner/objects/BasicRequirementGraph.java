@@ -58,6 +58,8 @@ public class BasicRequirementGraph implements RequirementGraph {
 
     @Override
     public List<Requirement> getTopologicallySortedRequirements() {
+        //Tarjan's algorithm - https://en.wikipedia.org/wiki/Topological_sorting
+
         List<Requirement> sortedRequirements = new ArrayList<>();
         Map<Requirement, Mark> nodeMarks = nodes.stream().collect(Collectors.toMap(node -> node, node -> Mark.UNMARKED));
 
