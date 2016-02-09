@@ -19,7 +19,11 @@ class BasicRequirementGraphTest extends Specification {
         new BasicRequirementGraph(Reqs.A).topologicallySortedRequirements == []
         new BasicRequirementGraph(Reqs.B).topologicallySortedRequirements == [new BasicRequirement(Reqs.A, 3)]
         new BasicRequirementGraph(Reqs.C).topologicallySortedRequirements == [new BasicRequirement(Reqs.A, 2)]
-        new BasicRequirementGraph(Reqs.D).topologicallySortedRequirements == [new BasicRequirement(Reqs.A, 2), new BasicRequirement(Reqs.C, 1), new BasicRequirement(Reqs.A, 3), new BasicRequirement(Reqs.B, 5)]
+        new BasicRequirementGraph(Reqs.D).topologicallySortedRequirements in [
+            [new BasicRequirement(Reqs.A, 2), new BasicRequirement(Reqs.C, 1), new BasicRequirement(Reqs.A, 3), new BasicRequirement(Reqs.B, 5)],
+            [new BasicRequirement(Reqs.A, 2), new BasicRequirement(Reqs.A, 3), new BasicRequirement(Reqs.C, 1), new BasicRequirement(Reqs.B, 5)],
+            [new BasicRequirement(Reqs.A, 2), new BasicRequirement(Reqs.A, 3), new BasicRequirement(Reqs.B, 5), new BasicRequirement(Reqs.C, 1)]
+        ]
     }
 
     enum Reqs implements GameObject {

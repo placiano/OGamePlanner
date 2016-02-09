@@ -9,8 +9,18 @@ import java.util.Map;
 /**
  * @author Frank van Heeswijk
  */
-public class BasicBuildOrder implements Iterable<GameObject> {
-    private final List<GameObject> gameObjects = new ArrayList<>();
+public class BasicBuildOrder implements BuildOrder, Iterable<GameObject> {
+    private List<GameObject> gameObjects = new ArrayList<>();
+
+    private List<GameObject> savedState;
+
+    public BasicBuildOrder() {
+
+    }
+
+    public BasicBuildOrder(List<GameObject> gameObjects) {
+        this.gameObjects.addAll(gameObjects);
+    }
 
     public BasicBuildOrder(RequirementGraph requirementGraph) {
         initializeFromRequirementGraph(requirementGraph);
@@ -28,6 +38,40 @@ public class BasicBuildOrder implements Iterable<GameObject> {
             }
             currentGameObjectLevel.put(requiredGameObject, requiredLevel);
         }
+    }
+
+    @Override
+    public void saveState() {
+        savedState = new ArrayList<>(gameObjects);
+    }
+
+    @Override
+    public void restoreState() {
+        if (savedState == null) {
+            throw new IllegalStateException("the state has not been saved");
+        }
+        gameObjects = savedState;
+    }
+
+    @Override
+    public void add(int index, GameObject gameObject) {
+        gameObjects.add(index, gameObject);
+    }
+
+    @Override
+    public void moveBy(int index, int delta) {
+        GameObject gameObject = gameObjects.remove(index);
+        gameObjects.add(index + delta, gameObject);
+    }
+
+    @Override
+    public GameObject get(int index) {
+        return gameObjects.get(index);
+    }
+
+    @Override
+    public int size() {
+        return gameObjects.size();
     }
 
     @Override
