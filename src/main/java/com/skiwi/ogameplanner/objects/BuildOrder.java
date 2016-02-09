@@ -3,7 +3,7 @@ package com.skiwi.ogameplanner.objects;
 /**
  * @author Frank van Heeswijk
  */
-public interface BuildOrder {
+public interface BuildOrder extends Iterable<GameObject> {
     void saveState();
 
     void restoreState();

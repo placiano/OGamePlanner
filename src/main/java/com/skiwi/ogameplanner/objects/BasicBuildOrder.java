@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * @author Frank van Heeswijk
  */
-public class BasicBuildOrder implements BuildOrder, Iterable<GameObject> {
+public class BasicBuildOrder implements BuildOrder {
     private List<GameObject> gameObjects = new ArrayList<>();
 
     private List<GameObject> savedState;
