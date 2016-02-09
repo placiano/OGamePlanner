@@ -184,6 +184,11 @@ class BasicBuildOrderTest extends Specification {
         ]
     }
 
+    void "test toString"() {
+        expect:
+        new BasicBuildOrder([Reqs.A, Reqs.B, Reqs.C]).toString() == "[A, B, C]"
+    }
+
     enum Reqs implements GameObject {
         A {
             @Override

@@ -78,4 +78,9 @@ public class BasicBuildOrder implements BuildOrder {
     public Iterator<GameObject> iterator() {
         return gameObjects.iterator();
     }
+
+    @Override
+    public String toString() {
+        return gameObjects.toString();
+    }
 }
